@@ -7,7 +7,8 @@
   "scripts": {
     "build": "rimraf dist && tsc",
     "predev": "npm run build",
-    "dev": "concurrently \"tsc -w & node\"  \"nodemon --env-file .env ./dist/server.js\""
+    "dev": "concurrently \"tsc -w & node\"  \"nodemon --env-file .env ./dist/server.js\"",
+    "start": "nodemon  ./dist/server.js"
   },
   "dependencies": {
     "@prisma/client": "^5.15.0",
@@ -32,6 +33,7 @@
     "@types/node": "^20.14.2",
     "@types/nodemailer": "^6.4.15",
     "concurrently": "^8.2.2",
+    "nodemon": "^3.1.4",
     "prettier": "^3.2.5",
     "prisma": "^5.15.0",
     "rimraf": "^5.0.6",
