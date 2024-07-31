@@ -25,10 +25,11 @@ model User {
   name      String
   email     String   @unique
   password  String
-  role      Role
+  role      Role     @default(USER)
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
   otp       String?  @unique
+  isVerfied Boolean  @default(false)
 
   @@index([uid], name: "uid_user_idx")
   @@index([email], name: "email_user_idx")
