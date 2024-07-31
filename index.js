@@ -1,12 +1,4 @@
-// random string generator
-
-const generateRandomString = (length) => {
-  let result = "";
-  const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return result;
-};
-console.log(generateRandomString(100));
+function generateOtp() {
+  const otp = crypto.randomInt(100000, 1000000);
+  return otp.toString().padStart(6, "0");
+}
