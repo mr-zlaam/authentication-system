@@ -1,0 +1,26 @@
+# Prisma CLI Commands
+
+## Setup and Initialization
+npx prisma init
+
+## Schema and Migration Management
+npx prisma migrate dev
+npx prisma migrate deploy
+npx prisma migrate reset
+npx prisma migrate status
+
+## Prisma Client
+npx prisma generate
+npx prisma studio
+
+## Database Introspection
+npx prisma db pull
+npx prisma db push
+
+## Seed Data
+npx prisma db seed
+
+## Miscellaneous
+npx prisma format
+npx prisma validate
+npx prisma help

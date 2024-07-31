@@ -1,0 +1,39 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// * User enum
+enum Role {
+  ADMIN
+  MODERATOR
+  USER
+}
+
+model User {
+  uid       String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  otp       String?  @unique
+
+  @@index([uid], name: "uid_user_idx")
+  @@index([email], name: "email_user_idx")
+  @@index([name], name: "name_user_idx")
+  @@index([role], name: "role_user_idx")
+  @@index([role, name], name: "role_name_user_idx")
+  @@index([role, createdAt], name: "role_createdAt_user_idx") // Composite index
+}
