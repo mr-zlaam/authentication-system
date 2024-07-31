@@ -1,12 +1,8 @@
 export interface UserData {
   uid: string; // Added uid property
-  username: string;
-  fullName: string;
+  name: string;
   email: string;
   password: string;
-  role: "ADMIN" | "MODERATOR" | "USER";
-  createdAt: string; // Changed from Date to string
-  updatedAt: string; // Changed from Date to string
 }
 
 export interface SearchQueryType {

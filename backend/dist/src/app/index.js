@@ -8,6 +8,8 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
+const errorMiddleware_1 = require("../middlewares/errorMiddleware");
+const authRouter_1 = require("../routers/authRouter");
 const app = (0, express_1.default)();
 exports.app = app;
 const corsOptions = {
@@ -26,3 +28,8 @@ app.use(body_parser_1.default.urlencoded({
 app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
+//* Routes
+app.use("/api/v1/auth", authRouter_1.authRouter);
+// * Error handlers
+app.use(errorMiddleware_1.notFoundHandler);
+app.use(errorMiddleware_1.errorHandler);
