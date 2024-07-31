@@ -42,7 +42,6 @@ next-env.d.ts
 node_modules
 # Keep environment variables out of version control
 .env
-./dist
 # Logs
 logs
 *.log
@@ -173,10 +172,3 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-./dist
-/dist
-./backend/dist
-/backend/dist/*
-/backend/dist/
-./backend/dist
-dist
