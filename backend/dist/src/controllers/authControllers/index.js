@@ -33,7 +33,6 @@ const registerController = (0, asynhandlerUtil_1.asyncHandler)((req, res) => __a
     yield (0, sendOTP_1.sendOTP)(email, OTP, name)
         .then((res) => console.log("OTP sent successfully"))
         .catch((err) => console.log(err));
-    console.log(OTP);
     const registerUser = yield db_1.prisma.user.create({
         data: {
             name,
@@ -53,12 +52,11 @@ const registerController = (0, asynhandlerUtil_1.asyncHandler)((req, res) => __a
     });
     return res
         .status(201)
-        .json((0, apiResponseUtil_1.apiResponse)(201, "User created successfully", { registerUser }, registerUser));
+        .json((0, apiResponseUtil_1.apiResponse)(201, "User created successfully", registerUser));
 }));
 exports.registerController = registerController;
 const verifyUserController = (0, asynhandlerUtil_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { otp } = req.body;
-    const userOTP = otp;
+    const { otp: userOTP } = req.body;
     if (!userOTP.trim())
         throw {
             status: CONSTANTS_1.BAD_REQUEST,
@@ -66,7 +64,7 @@ const verifyUserController = (0, asynhandlerUtil_1.asyncHandler)((req, res) => _
         };
     const isOTPValid = yield db_1.prisma.user.findUnique({
         where: {
-            otp: userOTP,
+            otp: userOTP.toString(),
         },
     });
     if (!isOTPValid)

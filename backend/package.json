@@ -7,8 +7,9 @@
   "scripts": {
     "build": "rimraf dist && tsc",
     "predev": "npm run build",
-    "dev": "concurrently \"tsc && copyfiles -u 1 './src/templ/**/*' './dist/src/'\" \"nodemon --env-file .env ./dist/server.js\"",
-    "start": "nodemon  ./dist/server.js"
+    "dev": "concurrently \"tsc && copyfiles -u 1 './src/templ/**/*' './dist/src/'\" \"nodemon ./dist/server.js --env-file .env ./dist/server.js\"",
+    "start": "nodemon  ./dist/server.js",
+    "watch": "bun --watch server.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.15.0",

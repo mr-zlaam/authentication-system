@@ -24,17 +24,15 @@ const registerController = asyncHandler(async (req: Request, res: Response) => {
   if (isUserExist) throw { status: BAD_REQUEST, message: "User already exist" };
 
   const OTP = generateOtp();
-  const parsedOTP = OTP.split("_")[0];
-  await sendOTP(email, parsedOTP, name)
+  await sendOTP(email, OTP, name)
     .then((res) => console.log("OTP sent successfully"))
     .catch((err) => console.log(err));
-  const randomSTR = generateRandomStrings(10);
   const registerUser = await prisma.user.create({
     data: {
       name,
       email: lowercaseMail,
       password,
-      otp: `${OTP}_${randomSTR}`,
+      otp: OTP,
       isVerfied: false,
       role: "USER",
     },
@@ -49,14 +47,7 @@ const registerController = asyncHandler(async (req: Request, res: Response) => {
 
   return res
     .status(201)
-    .json(
-      apiResponse(
-        201,
-        "User created successfully",
-        { registerUser },
-        registerUser
-      )
-    );
+    .json(apiResponse(201, "User created successfully", registerUser));
 });
 
 const verifyUserController = asyncHandler(
@@ -67,13 +58,7 @@ const verifyUserController = asyncHandler(
         status: BAD_REQUEST,
         message: "Please enter OTP",
       };
-    const user = await prisma.user.findFirst({
-      where: {
-        otp: {
-          startsWith: userOTP,
-        },
-      },
-    });
+
     const isOTPValid = await prisma.user.findUnique({
       where: {
         otp: userOTP.toString(),

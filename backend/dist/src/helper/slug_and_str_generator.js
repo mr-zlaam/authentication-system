@@ -1,8 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateRandomStrings = generateRandomStrings;
 exports.generateSlug = generateSlug;
 exports.generateOtp = generateOtp;
+const node_crypto_1 = __importDefault(require("node:crypto"));
 function generateRandomStrings(length) {
     const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let randomString = "";
@@ -20,6 +24,6 @@ function generateSlug(slugString) {
 }
 // 5 digit random otp generator
 function generateOtp() {
-    const otp = Math.floor(100000 + Math.random() * 900000);
-    return otp.toString();
+    const otp = node_crypto_1.default.randomInt(100000, 1000000);
+    return otp.toString().padStart(6, "0");
 }
