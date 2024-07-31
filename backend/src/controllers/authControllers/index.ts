@@ -10,6 +10,7 @@ import { BAD_REQUEST } from "../../CONSTANTS";
 import { validationResult } from "express-validator";
 import { UserData } from "../../types";
 import { sendOTP } from "../../helper/sendOTP";
+import { passwordHasher } from "../../helper/passwordHasher";
 
 const registerController = asyncHandler(async (req: Request, res: Response) => {
   const errors = validationResult(req);
@@ -27,11 +28,15 @@ const registerController = asyncHandler(async (req: Request, res: Response) => {
   await sendOTP(email, OTP, name)
     .then((res) => console.log("OTP sent successfully"))
     .catch((err) => console.log(err));
+  // password hashing
+  const hashedPassword = (
+    await passwordHasher(password, res)
+  ).toString() as string;
   const registerUser = await prisma.user.create({
     data: {
       name,
       email: lowercaseMail,
-      password,
+      password: hashedPassword,
       otp: OTP,
       isVerfied: false,
       role: "USER",

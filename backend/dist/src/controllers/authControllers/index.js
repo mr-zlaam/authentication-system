@@ -17,6 +17,7 @@ const slug_and_str_generator_1 = require("../../helper/slug_and_str_generator");
 const CONSTANTS_1 = require("../../CONSTANTS");
 const express_validator_1 = require("express-validator");
 const sendOTP_1 = require("../../helper/sendOTP");
+const passwordHasher_1 = require("../../helper/passwordHasher");
 const registerController = (0, asynhandlerUtil_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
@@ -33,11 +34,13 @@ const registerController = (0, asynhandlerUtil_1.asyncHandler)((req, res) => __a
     yield (0, sendOTP_1.sendOTP)(email, OTP, name)
         .then((res) => console.log("OTP sent successfully"))
         .catch((err) => console.log(err));
+    // password hashing
+    const hashedPassword = (yield (0, passwordHasher_1.passwordHasher)(password, res)).toString();
     const registerUser = yield db_1.prisma.user.create({
         data: {
             name,
             email: lowercaseMail,
-            password,
+            password: hashedPassword,
             otp: OTP,
             isVerfied: false,
             role: "USER",
