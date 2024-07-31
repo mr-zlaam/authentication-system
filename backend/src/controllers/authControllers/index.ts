@@ -6,6 +6,7 @@ import { generateOtp } from "../../helper/slug_and_str_generator";
 import { BAD_REQUEST } from "../../CONSTANTS";
 import { validationResult } from "express-validator";
 import { UserData } from "../../types";
+import { sendOTP } from "../../helper/sendOTP";
 
 const registerController = asyncHandler(async (req: Request, res: Response) => {
   const errors = validationResult(req);
@@ -20,6 +21,9 @@ const registerController = asyncHandler(async (req: Request, res: Response) => {
   if (isUserExist) throw { status: BAD_REQUEST, message: "User already exist" };
 
   const OTP = generateOtp();
+  await sendOTP(email, OTP, name)
+    .then((res) => console.log("OTP sent successfully"))
+    .catch((err) => console.log(err));
   console.log(OTP);
   const registerUser = await prisma.user.create({
     data: {
