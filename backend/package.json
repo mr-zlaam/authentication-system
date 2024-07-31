@@ -7,7 +7,7 @@
   "scripts": {
     "build": "rimraf dist && tsc",
     "predev": "npm run build",
-    "dev": "concurrently \"tsc -w & node\"  \"nodemon --env-file .env ./dist/server.js\"",
+    "dev": "concurrently \"tsc && copyfiles -u 1 './src/templ/**/*' './dist/src/'\" \"nodemon --env-file .env ./dist/server.js\"",
     "start": "nodemon  ./dist/server.js"
   },
   "dependencies": {
@@ -20,6 +20,7 @@
     "express-validator": "^7.1.0",
     "http-status-codes": "^2.3.0",
     "jsonwebtoken": "^9.0.2",
+    "node-schedule": "^2.1.1",
     "nodemailer": "^6.9.14",
     "zod": "^3.23.8"
   },
@@ -33,6 +34,7 @@
     "@types/node": "^20.14.2",
     "@types/nodemailer": "^6.4.15",
     "concurrently": "^8.2.2",
+    "copyfiles": "^2.4.1",
     "nodemon": "^3.1.4",
     "prettier": "^3.2.5",
     "prisma": "^5.15.0",

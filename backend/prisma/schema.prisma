@@ -36,5 +36,6 @@ model User {
   @@index([name], name: "name_user_idx")
   @@index([role], name: "role_user_idx")
   @@index([role, name], name: "role_name_user_idx")
+  @@index([otp], name: "otp_user_idx")
   @@index([role, createdAt], name: "role_createdAt_user_idx") // Composite index
 }

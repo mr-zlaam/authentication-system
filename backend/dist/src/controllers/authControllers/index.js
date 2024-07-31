@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.registerController = void 0;
+exports.verifyUserController = exports.registerController = void 0;
 const apiResponseUtil_1 = require("../../helper/apiResponseUtil");
 const asynhandlerUtil_1 = require("../../helper/asynhandlerUtil");
 const db_1 = require("../../db");
@@ -56,3 +56,42 @@ const registerController = (0, asynhandlerUtil_1.asyncHandler)((req, res) => __a
         .json((0, apiResponseUtil_1.apiResponse)(201, "User created successfully", { registerUser }, registerUser));
 }));
 exports.registerController = registerController;
+const verifyUserController = (0, asynhandlerUtil_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { otp } = req.body;
+    const userOTP = otp;
+    if (!userOTP.trim())
+        throw {
+            status: CONSTANTS_1.BAD_REQUEST,
+            message: "Please enter OTP",
+        };
+    const isOTPValid = yield db_1.prisma.user.findUnique({
+        where: {
+            otp: userOTP,
+        },
+    });
+    if (!isOTPValid)
+        throw {
+            status: CONSTANTS_1.BAD_REQUEST,
+            message: "Invalid OTP",
+        };
+    const verifiedUser = yield db_1.prisma.user.update({
+        where: {
+            otp: userOTP.toString(),
+        },
+        data: {
+            isVerfied: true,
+            otp: "",
+        },
+        select: {
+            uid: true,
+            email: true,
+            name: true,
+            role: true,
+            isVerfied: true,
+        },
+    });
+    return res
+        .status(201)
+        .json((0, apiResponseUtil_1.apiResponse)(201, "OTP verified successfully", verifiedUser));
+}));
+exports.verifyUserController = verifyUserController;

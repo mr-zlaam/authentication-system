@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 export function generateRandomStrings(length: number) {
   const characters =
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -18,6 +19,6 @@ export function generateSlug(slugString: string) {
 
 // 5 digit random otp generator
 export function generateOtp() {
-  const otp = Math.floor(100000 + Math.random() * 900000);
-  return otp.toString();
+  const otp = crypto.randomInt(100000, 1000000);
+  return otp.toString().padStart(6, "0");
 }
