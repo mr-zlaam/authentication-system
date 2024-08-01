@@ -6,7 +6,7 @@ import {
   generateOtp,
   generateRandomStrings,
 } from "../../helper/slug_and_str_generator";
-import { BAD_REQUEST } from "../../CONSTANTS";
+import { BAD_REQUEST, CREATED } from "../../CONSTANTS";
 import { validationResult } from "express-validator";
 import { UserData } from "../../types";
 import { sendOTP } from "../../helper/sendOTP";
@@ -51,8 +51,8 @@ const registerController = asyncHandler(async (req: Request, res: Response) => {
   });
 
   return res
-    .status(201)
-    .json(apiResponse(201, "User created successfully", registerUser));
+    .status(CREATED)
+    .json(apiResponse(CREATED, "User created successfully", registerUser));
 });
 
 const verifyUserController = asyncHandler(

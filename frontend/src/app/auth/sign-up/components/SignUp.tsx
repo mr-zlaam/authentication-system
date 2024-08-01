@@ -20,8 +20,13 @@ import { FaEyeSlash, FaEye } from "react-icons/fa";
 import { useState } from "react";
 import { axios } from "@/axios";
 import { useMessage } from "@/hooks/useMessage";
+import { useLoading } from "@/hooks/useLoading";
 
 export function SignUp() {
+  // messages
+  const { errorMessage, successMessage } = useMessage();
+  // Loading
+  const { isLoading, startLoading, stopLoading } = useLoading();
   // toggling password visibilaty state
   const [isPassVisible, setIsPassVisible] = useState(false);
   const {
@@ -36,6 +41,7 @@ export function SignUp() {
   const handleRegisterUser = async (data: UserType) => {
     const { firstName, lastName, email, password } = data;
     try {
+      startLoading();
       const response = await axios.post(
         "/registerUser",
         {
@@ -49,11 +55,22 @@ export function SignUp() {
           },
         }
       );
+      console.log(response.data);
+      if (response.status === 201) {
+        reset();
+        successMessage(response.data.message || "User registered successfully");
+      }
     } catch (error: any) {
-      console.log(error.message);
+      console.log(error);
+      if (error instanceof Error) errorMessage(error.message);
+      else {
+        errorMessage("Something went wrong while registering user");
+      }
+    } finally {
+      stopLoading();
     }
   };
-  const { errorMessage } = useMessage();
+
   return (
     <Card
       className="mx-auto max-w-sm"
@@ -144,9 +161,6 @@ export function SignUp() {
             Sign in
           </Link>
         </div>
-        <button onClick={() => errorMessage("Account created successfully")}>
-          Click me
-        </button>
       </CardContent>
     </Card>
   );
