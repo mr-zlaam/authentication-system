@@ -49,7 +49,7 @@ export function SignUp() {
     try {
       startLoading();
       const response = await axios.post(
-        "/registerUser",
+        "/auth/registerUser",
         {
           name: `${firstName} ${lastName}`,
           email,
@@ -62,7 +62,7 @@ export function SignUp() {
         }
       );
       console.log(response.data);
-      if (response.status === 201) {
+      if (response.status === 200) {
         reset();
         successMessage(
           response.data.success &&

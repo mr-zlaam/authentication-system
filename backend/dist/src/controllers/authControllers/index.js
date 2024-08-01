@@ -54,8 +54,8 @@ const registerController = (0, asynhandlerUtil_1.asyncHandler)((req, res) => __a
         },
     });
     return res
-        .status(201)
-        .json((0, apiResponseUtil_1.apiResponse)(201, "User created successfully", registerUser));
+        .status(CONSTANTS_1.OK)
+        .json((0, apiResponseUtil_1.apiResponse)(CONSTANTS_1.OK, "User created successfully", registerUser));
 }));
 exports.registerController = registerController;
 const verifyUserController = (0, asynhandlerUtil_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -92,7 +92,7 @@ const verifyUserController = (0, asynhandlerUtil_1.asyncHandler)((req, res) => _
         },
     });
     return res
-        .status(201)
-        .json((0, apiResponseUtil_1.apiResponse)(201, "OTP verified successfully", verifiedUser));
+        .status(CONSTANTS_1.OK)
+        .json((0, apiResponseUtil_1.apiResponse)(CONSTANTS_1.OK, "OTP verified successfully", verifiedUser));
 }));
 exports.verifyUserController = verifyUserController;

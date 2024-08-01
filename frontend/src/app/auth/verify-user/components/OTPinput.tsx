@@ -57,9 +57,18 @@ export function OTPinput() {
           title: "✔️Success",
           description: "OTP verified successfully",
         });
+      } else if (response.status === 400) {
+        toast({
+          title: "❌ Failed",
+          description: "Invalid OTP",
+        });
       }
     } catch (error: any) {
-      console.log(error.message);
+      console.log(error);
+      toast({
+        title: "❌ Failed",
+        description: error.response.data.error.message,
+      });
     }
   }
 

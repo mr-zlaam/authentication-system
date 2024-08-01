@@ -18,5 +18,5 @@ export const userSchema: z.ZodSchema<UserType> = z.object({
   password: z
     .string({ message: "Password is required" })
     .min(6, { message: "Password must contain at least 6 characters" })
-    .max(20, { message: "Password is too long" }),
+    .max(50, { message: "Password is too long" }),
 });
