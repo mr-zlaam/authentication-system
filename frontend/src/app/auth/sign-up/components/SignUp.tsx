@@ -18,6 +18,8 @@ import { userSchema } from "@/validation/zod";
 import { UserType } from "@/types";
 import { FaEyeSlash, FaEye } from "react-icons/fa";
 import { useState } from "react";
+import { axios } from "@/axios";
+import { useMessage } from "@/hooks/useMessage";
 
 export function SignUp() {
   // toggling password visibilaty state
@@ -33,7 +35,25 @@ export function SignUp() {
   // Create User
   const handleRegisterUser = async (data: UserType) => {
     const { firstName, lastName, email, password } = data;
+    try {
+      const response = await axios.post(
+        "/registerUser",
+        {
+          name: `${firstName} ${lastName}`,
+          email,
+          password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    } catch (error: any) {
+      console.log(error.message);
+    }
   };
+  const { errorMessage } = useMessage();
   return (
     <Card
       className="mx-auto max-w-sm"
@@ -124,6 +144,9 @@ export function SignUp() {
             Sign in
           </Link>
         </div>
+        <button onClick={() => errorMessage("Account created successfully")}>
+          Click me
+        </button>
       </CardContent>
     </Card>
   );
