@@ -31,7 +31,9 @@ export function SignUp() {
     resolver: zodResolver(userSchema),
   });
   // Create User
-  const handleRegisterUser = async () => {};
+  const handleRegisterUser = async (data: UserType) => {
+    const { firstName, lastName, email, password } = data;
+  };
   return (
     <Card
       className="mx-auto max-w-sm"
@@ -81,6 +83,7 @@ export function SignUp() {
               {...register("email")}
               id="email"
               type="email"
+              className="lowercase"
               placeholder="john@example.com"
             />
             <Link href="#" className="ml-auto inline-block text-sm underline">
