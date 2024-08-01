@@ -1,6 +1,6 @@
 import { UserType } from "@/types";
 import z from "zod";
-
+// USER VALIDATION SCHEMA
 export const userSchema: z.ZodSchema<UserType> = z.object({
   firstName: z
     .string()
@@ -19,4 +19,10 @@ export const userSchema: z.ZodSchema<UserType> = z.object({
     .string({ message: "Password is required" })
     .min(6, { message: "Password must contain at least 6 characters" })
     .max(50, { message: "Password is too long" }),
+});
+// OTP VALIDATION SCHEMA
+export const FormSchema = z.object({
+  pin: z.string().min(6, {
+    message: "Your one-time password must be 6 characters.",
+  }),
 });

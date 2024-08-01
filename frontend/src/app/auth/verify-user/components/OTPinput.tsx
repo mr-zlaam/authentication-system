@@ -21,14 +21,16 @@ import {
 } from "@/components/ui/input-otp";
 import { toast } from "@/components/ui/use-toast";
 import { axios } from "@/axios";
-
-const FormSchema = z.object({
-  pin: z.string().min(6, {
-    message: "Your one-time password must be 6 characters.",
-  }),
-});
+import { FormSchema } from "@/validation/zod";
+import { useLoading } from "@/hooks/useLoading";
+import { useMessage } from "@/hooks/useMessage";
+import Loader from "@/_components/loader/loader";
+import { cn } from "@/lib/utils";
+// validation schema
 
 export function OTPinput() {
+  const { errorMessage, successMessage } = useMessage();
+  const { isLoading, startLoading, stopLoading } = useLoading();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -37,10 +39,9 @@ export function OTPinput() {
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log(data.pin);
-
     // Send OTP
     try {
+      startLoading();
       const response = await axios.post(
         "/auth/verifyUser",
         {
@@ -53,28 +54,30 @@ export function OTPinput() {
         }
       );
       if (response.status === 200) {
-        toast({
-          title: "✔️Success",
-          description: "OTP verified successfully",
-        });
+        form.reset();
+        return successMessage("OTP verified successfully");
       } else if (response.status === 400) {
-        toast({
-          title: "❌ Failed",
-          description: "Invalid OTP",
-        });
+        return errorMessage("Invalid OTP");
       }
     } catch (error: any) {
       console.log(error);
-      toast({
-        title: "❌ Failed",
-        description: error.response.data.error.message,
-      });
+      stopLoading();
+      errorMessage(
+        error?.response?.data.error.message ||
+          "Something went wrong while sending otp"
+      );
+      if (error instanceof Error) {
+        stopLoading();
+        console.log(error.message);
+      } else {
+        return error;
+      }
     }
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6 ">
         <FormField
           control={form.control}
           name="pin"
@@ -84,24 +87,29 @@ export function OTPinput() {
               <FormControl>
                 <InputOTP maxLength={6} {...field}>
                   <InputOTPGroup>
-                    <InputOTPSlot index={0} />
-                    <InputOTPSlot index={1} />
-                    <InputOTPSlot index={2} />
-                    <InputOTPSlot index={3} />
-                    <InputOTPSlot index={4} />
-                    <InputOTPSlot index={5} />
+                    <InputOTPSlot className="caret-blink" index={0} />
+                    <InputOTPSlot className="caret-blink" index={1} />
+                    <InputOTPSlot className="caret-blink" index={2} />
+                    <InputOTPSlot className="caret-blink" index={3} />
+                    <InputOTPSlot className="caret-blink" index={4} />
+                    <InputOTPSlot className="caret-blink" index={5} />
                   </InputOTPGroup>
                 </InputOTP>
               </FormControl>
               <FormDescription>
-                Please enter the one-time password sent to your phone.
+                Please enter the one-time password sent to your email.
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-
-        <Button type="submit">Submit</Button>
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className={cn(isLoading && "cursor-not-allowed")}
+        >
+          {isLoading ? <Loader /> : <span>Verify OTP</span>}
+        </Button>{" "}
       </form>
     </Form>
   );

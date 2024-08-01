@@ -159,6 +159,7 @@ export function SignUp() {
           </div>
 
           <Button
+            type="submit"
             disabled={isLoading}
             className={cn("w-full", isLoading && "cursor-not-allowed")}
           >
