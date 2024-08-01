@@ -26,11 +26,13 @@ import { useLoading } from "@/hooks/useLoading";
 import { useMessage } from "@/hooks/useMessage";
 import Loader from "@/_components/loader/loader";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 // validation schema
 
 export function OTPinput() {
   const { errorMessage, successMessage } = useMessage();
   const { isLoading, startLoading, stopLoading } = useLoading();
+  const [isResendOTPModalOpened, setIsResendOTPModalOpened] = useState(false);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
