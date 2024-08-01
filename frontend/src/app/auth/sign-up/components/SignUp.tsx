@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 
+import { axios } from "@/axios";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,16 +12,18 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FcGoogle } from "react-icons/fc";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { userSchema } from "@/validation/zod";
-import { UserType } from "@/types";
-import { FaEyeSlash, FaEye } from "react-icons/fa";
-import { useState } from "react";
-import { axios } from "@/axios";
-import { useMessage } from "@/hooks/useMessage";
 import { useLoading } from "@/hooks/useLoading";
+import { useMessage } from "@/hooks/useMessage";
+import { UserType } from "@/types";
+import { userSchema } from "@/validation/zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
+import Loader from "@/_components/loader/loader";
+import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export function SignUp() {
   // messages
@@ -29,6 +32,9 @@ export function SignUp() {
   const { isLoading, startLoading, stopLoading } = useLoading();
   // toggling password visibilaty state
   const [isPassVisible, setIsPassVisible] = useState(false);
+  // router
+  const router = useRouter();
+  // React hook form
   const {
     register,
     reset,
@@ -58,7 +64,11 @@ export function SignUp() {
       console.log(response.data);
       if (response.status === 201) {
         reset();
-        successMessage(response.data.message || "User registered successfully");
+        successMessage(
+          response.data.success &&
+            "Please Check Your Email for OTP Verification"
+        );
+        return router.push("/auth/verify-user");
       }
     } catch (error: any) {
       console.log(error);
@@ -147,9 +157,14 @@ export function SignUp() {
               </span>
             </div>
           </div>
-          <Button type="submit" className="w-full">
-            Create an account
+
+          <Button
+            disabled={isLoading}
+            className={cn("w-full", isLoading && "cursor-not-allowed")}
+          >
+            {isLoading ? <Loader /> : <span>Create an account</span>}
           </Button>
+
           <Button variant="outline" className="w-full">
             <FcGoogle className="mr-2 h-4 w-4" />
             Sign up with Google

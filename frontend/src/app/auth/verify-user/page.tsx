@@ -4,7 +4,7 @@ import { OTPinput } from "./components/OTPinput";
 function VerifyUsesPage() {
   return (
     <>
-      <section className="h-screen flex justify-center items-center ">
+      <section className="h-screen flex flex-col justify-center items-center ">
         <OTPinput />
       </section>
     </>
