@@ -74,7 +74,7 @@ export function OTPinput() {
       }
     }
   }
-
+  const hello = () => {};
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6 ">
@@ -103,13 +103,18 @@ export function OTPinput() {
             </FormItem>
           )}
         />
-        <Button
-          type="submit"
-          disabled={isLoading}
-          className={cn(isLoading && "cursor-not-allowed")}
-        >
-          {isLoading ? <Loader /> : <span>Verify OTP</span>}
-        </Button>{" "}
+        <div>
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className={cn(isLoading && "cursor-not-allowed")}
+          >
+            {isLoading ? <Loader /> : <span>Verify OTP</span>}
+          </Button>{" "}
+          <Button variant={"outline"} onClick={hello} type="button">
+            &rarr; <span className="mx-4"> Resend OTP</span>
+          </Button>
+        </div>
       </form>
     </Form>
   );
