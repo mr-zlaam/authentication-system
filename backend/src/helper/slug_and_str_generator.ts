@@ -19,6 +19,8 @@ export function generateSlug(slugString: string) {
 
 // 5 digit random otp generator
 export function generateOtp() {
-  const otp = crypto.randomInt(100000, 1000000);
-  return otp.toString().padStart(6, "0");
+  let otp = crypto.randomInt(100000, 1000000).toString();
+  otp = otp.padStart(6, "0") as string;
+  const otpExpiry = new Date(Date.now() + 30 * 60 * 1000); // Set expiration time to 5 minutes from now
+  return { otp, otpExpiry };
 }

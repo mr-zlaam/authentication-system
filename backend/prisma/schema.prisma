@@ -21,21 +21,27 @@ enum Role {
 }
 
 model User {
-  uid       String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt DateTime @updatedAt @db.Timestamptz(3)
-  otp       String?  @unique
-  isVerfied Boolean  @default(false)
+  uid             String    @id @default(cuid())
+  name            String
+  email           String    @unique
+  password        String
+  role            Role      @default(USER)
+  createdAt       DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime  @updatedAt @db.Timestamptz(3)
+  otp             String?   @unique
+  otpExpiry       DateTime?
+  isVerfied       Boolean   @default(false)
+  otpRequestCount Int       @default(0)
+  lastOtpRequest  DateTime?
+  cooldownExpiry  DateTime?
 
-  @@index([uid], name: "uid_user_idx")
-  @@index([email], name: "email_user_idx")
-  @@index([name], name: "name_user_idx")
-  @@index([role], name: "role_user_idx")
+  @@index([email], name: "email_user_idx") // Unique index for quick lookups by email
+  @@index([name], name: "name_user_idx") // Index for queries involving user names
+  @@index([otp], name: "otp_user_idx") // Unique index for OTP lookups
+  @@index([role], name: "role_user_idx") // Index for filtering by user role
+  @@index([createdAt], name: "createdAt_user_idx") // Index for querying by creation date
+  // Composite index for commonly filtered queries
+  @@index([role, createdAt], name: "role_createdAt_user_idx")
+  // Optional: index to optimize queries on role and name, if frequently used together
   @@index([role, name], name: "role_name_user_idx")
-  @@index([otp], name: "otp_user_idx")
-  @@index([role, createdAt], name: "role_createdAt_user_idx") // Composite index
 }

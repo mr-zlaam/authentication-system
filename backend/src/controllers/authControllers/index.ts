@@ -1,16 +1,13 @@
 import { Request, Response } from "express";
+import { validationResult } from "express-validator";
+import { BAD_REQUEST, OK } from "../../CONSTANTS";
+import { prisma } from "../../db";
 import { apiResponse } from "../../helper/apiResponseUtil";
 import { asyncHandler } from "../../helper/asynhandlerUtil";
-import { prisma } from "../../db";
-import {
-  generateOtp,
-  generateRandomStrings,
-} from "../../helper/slug_and_str_generator";
-import { BAD_REQUEST, CREATED, OK } from "../../CONSTANTS";
-import { validationResult } from "express-validator";
-import { UserData } from "../../types";
-import { sendOTP } from "../../helper/sendOTP";
 import { passwordHasher } from "../../helper/passwordHasher";
+import { sendOTP } from "../../helper/sendOTP";
+import { generateOtp } from "../../helper/slug_and_str_generator";
+import { UserData } from "../../types";
 
 const registerController = asyncHandler(async (req: Request, res: Response) => {
   const errors = validationResult(req);
@@ -24,7 +21,7 @@ const registerController = asyncHandler(async (req: Request, res: Response) => {
   });
   if (isUserExist) throw { status: BAD_REQUEST, message: "User already exist" };
 
-  const OTP = generateOtp();
+  const { otp: OTP, otpExpiry } = generateOtp();
   await sendOTP(email, OTP, name)
     .then((res) => console.log("OTP sent successfully"))
     .catch((err) => console.log(err));
@@ -38,6 +35,7 @@ const registerController = asyncHandler(async (req: Request, res: Response) => {
       email: lowercaseMail,
       password: hashedPassword,
       otp: OTP,
+      otpExpiry,
       isVerfied: false,
       role: "USER",
     },
@@ -54,7 +52,7 @@ const registerController = asyncHandler(async (req: Request, res: Response) => {
     .status(OK)
     .json(apiResponse(OK, "User created successfully", registerUser));
 });
-
+// Verify User if he is real or just bot
 const verifyUserController = asyncHandler(
   async (req: Request, res: Response) => {
     const { otp: userOTP } = req.body;
@@ -63,24 +61,41 @@ const verifyUserController = asyncHandler(
         status: BAD_REQUEST,
         message: "Please enter OTP",
       };
-
-    const isOTPValid = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: {
         otp: userOTP.toString(),
       },
     });
-    if (!isOTPValid)
+
+    if (!user)
+      throw {
+        status: BAD_REQUEST,
+        message: "User Doesn't exist",
+      };
+    if (user.otp?.trim() !== userOTP.trim()) {
       throw {
         status: BAD_REQUEST,
         message: "Invalid OTP",
       };
+    }
+    // check if otp is expired
+    if (user.otpExpiry && user.otpExpiry < new Date()) {
+      throw {
+        status: BAD_REQUEST,
+        message: "OTP is expired",
+      };
+    }
+
     const verifiedUser = await prisma.user.update({
       where: {
         otp: userOTP.toString(),
       },
       data: {
         isVerfied: true,
-        otp: "",
+        otp: null,
+        otpExpiry: null,
+        otpRequestCount: 0,
+        cooldownExpiry: null,
       },
       select: {
         uid: true,
