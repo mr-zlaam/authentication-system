@@ -21,6 +21,6 @@ export function generateSlug(slugString: string) {
 export function generateOtp() {
   let otp = crypto.randomInt(100000, 1000000).toString();
   otp = otp.padStart(6, "0") as string;
-  const otpExpiry = new Date(Date.now() + 30 * 60 * 1000); // Set expiration time to 5 minutes from now
+  const otpExpiry = new Date(Date.now() + 30 * 60 * 1000); // change expiry time using the first letter after Date.now()+1
   return { otp, otpExpiry };
 }

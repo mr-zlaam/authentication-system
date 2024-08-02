@@ -20,7 +20,7 @@ export async function sendOTP(to: string, otp: string, name: string) {
   htmlTemplate = htmlTemplate.replace("{{otp}}", otp).replace("{{name}}", name);
   const randomStr = generateRandomStrings(10);
   let mailOptions = {
-    from: "noreply@zlaam.com",
+    from: "noreply@github.com",
     to: to,
     subject: "OTP Verification",
     html: htmlTemplate,

@@ -10,14 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyUserController = exports.registerController = void 0;
+const express_validator_1 = require("express-validator");
+const CONSTANTS_1 = require("../../CONSTANTS");
+const db_1 = require("../../db");
 const apiResponseUtil_1 = require("../../helper/apiResponseUtil");
 const asynhandlerUtil_1 = require("../../helper/asynhandlerUtil");
-const db_1 = require("../../db");
-const slug_and_str_generator_1 = require("../../helper/slug_and_str_generator");
-const CONSTANTS_1 = require("../../CONSTANTS");
-const express_validator_1 = require("express-validator");
-const sendOTP_1 = require("../../helper/sendOTP");
 const passwordHasher_1 = require("../../helper/passwordHasher");
+const sendOTP_1 = require("../../helper/sendOTP");
+const slug_and_str_generator_1 = require("../../helper/slug_and_str_generator");
 const registerController = (0, asynhandlerUtil_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
@@ -30,7 +30,7 @@ const registerController = (0, asynhandlerUtil_1.asyncHandler)((req, res) => __a
     });
     if (isUserExist)
         throw { status: CONSTANTS_1.BAD_REQUEST, message: "User already exist" };
-    const OTP = (0, slug_and_str_generator_1.generateOtp)();
+    const { otp: OTP, otpExpiry } = (0, slug_and_str_generator_1.generateOtp)();
     yield (0, sendOTP_1.sendOTP)(email, OTP, name)
         .then((res) => console.log("OTP sent successfully"))
         .catch((err) => console.log(err));
@@ -42,6 +42,7 @@ const registerController = (0, asynhandlerUtil_1.asyncHandler)((req, res) => __a
             email: lowercaseMail,
             password: hashedPassword,
             otp: OTP,
+            otpExpiry,
             isVerfied: false,
             role: "USER",
         },
@@ -58,30 +59,48 @@ const registerController = (0, asynhandlerUtil_1.asyncHandler)((req, res) => __a
         .json((0, apiResponseUtil_1.apiResponse)(CONSTANTS_1.OK, "User created successfully", registerUser));
 }));
 exports.registerController = registerController;
+// Verify User if he is real or just bot
 const verifyUserController = (0, asynhandlerUtil_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { otp: userOTP } = req.body;
     if (!userOTP.trim())
         throw {
             status: CONSTANTS_1.BAD_REQUEST,
             message: "Please enter OTP",
         };
-    const isOTPValid = yield db_1.prisma.user.findUnique({
+    const user = yield db_1.prisma.user.findUnique({
         where: {
             otp: userOTP.toString(),
         },
     });
-    if (!isOTPValid)
+    if (!user)
+        throw {
+            status: CONSTANTS_1.BAD_REQUEST,
+            message: "User Doesn't exist",
+        };
+    if (((_a = user.otp) === null || _a === void 0 ? void 0 : _a.trim()) !== userOTP.trim()) {
         throw {
             status: CONSTANTS_1.BAD_REQUEST,
             message: "Invalid OTP",
         };
+    }
+    // check if otp is expired
+    if (user.otpExpiry && user.otpExpiry < new Date()) {
+        throw {
+            status: CONSTANTS_1.BAD_REQUEST,
+            message: "OTP is expired",
+        };
+    }
     const verifiedUser = yield db_1.prisma.user.update({
         where: {
             otp: userOTP.toString(),
         },
         data: {
             isVerfied: true,
-            otp: "",
+            otp: null,
+            otpExpiry: null,
+            otpRequestCount: 0,
+            cooldownExpiry: null,
         },
         select: {
             uid: true,

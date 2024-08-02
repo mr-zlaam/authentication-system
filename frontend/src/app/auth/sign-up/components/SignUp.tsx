@@ -72,7 +72,11 @@ export function SignUp() {
       }
     } catch (error: any) {
       console.log(error);
-      if (error instanceof Error) errorMessage(error.message);
+      errorMessage(
+        error?.response?.data?.error?.message ||
+          "Something went wrong while registering user"
+      );
+      if (error instanceof Error) console.log(error.message);
       else {
         errorMessage("Something went wrong while registering user");
       }
@@ -133,9 +137,9 @@ export function SignUp() {
               className="lowercase"
               placeholder="john@example.com"
             />
-            <Link href="#" className="ml-auto inline-block text-sm underline">
+            {/* <Link href="#" className="ml-auto inline-block text-sm underline">
               Forgot your password?
-            </Link>
+            </Link> */}
           </div>
           <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
@@ -166,7 +170,7 @@ export function SignUp() {
             {isLoading ? <Loader /> : <span>Create an account</span>}
           </Button>
 
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full" type="button">
             <FcGoogle className="mr-2 h-4 w-4" />
             Sign up with Google
           </Button>

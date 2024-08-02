@@ -56,6 +56,7 @@ export function OTPinput() {
         }
       );
       if (response.status === 200) {
+        stopLoading();
         form.reset();
         return successMessage("OTP verified successfully");
       } else if (response.status === 400) {
@@ -74,6 +75,8 @@ export function OTPinput() {
       } else {
         return error;
       }
+    } finally {
+      stopLoading();
     }
   }
   const hello = () => {};
