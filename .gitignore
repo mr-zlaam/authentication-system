@@ -17,7 +17,7 @@
 
 # production
 /build
-
+/dist/index.js
 # misc
 .DS_Store
 *.pem
