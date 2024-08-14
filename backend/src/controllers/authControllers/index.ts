@@ -108,8 +108,18 @@ const verifyUserController = asyncHandler(
     return res
       .status(OK)
       .json(apiResponse(OK, "OTP verified successfully", verifiedUser));
-  }
+  },
 );
 
+// ** User LoginController
+const loginControlller = asyncHandler(async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  if ((!email, !password)) {
+    throw {
+      status: BAD_REQUEST,
+      message: "Email and password is required",
+    };
+  }
+});
 // Exports
 export { registerController, verifyUserController };

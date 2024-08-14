@@ -24,6 +24,7 @@ import { FcGoogle } from "react-icons/fc";
 import Loader from "@/_components/loader/loader";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import DivWrapper from "@/_components/Divwrapper";
 
 export function SignUp() {
   // messages
@@ -59,14 +60,14 @@ export function SignUp() {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       console.log(response.data);
       if (response.status === 200) {
         reset();
         successMessage(
           response.data.success &&
-            "Please Check Your Email for OTP Verification"
+            "Please Check Your Email for OTP Verification",
         );
         return router.push("/auth/verify-user");
       }
@@ -74,7 +75,7 @@ export function SignUp() {
       console.log(error);
       errorMessage(
         error?.response?.data?.error?.message ||
-          "Something went wrong while registering user"
+          "Something went wrong while registering user",
       );
       if (error instanceof Error) console.log(error.message);
       else {
@@ -157,7 +158,9 @@ export function SignUp() {
                 onClick={() => setIsPassVisible(!isPassVisible)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
               >
-                {isPassVisible ? <FaEyeSlash /> : <FaEye />}
+                <DivWrapper className="h-[30px] w-[30px]">
+                  {isPassVisible ? <FaEyeSlash /> : <FaEye />}
+                </DivWrapper>
               </span>
             </div>
           </div>
