@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyUserController = exports.registerController = void 0;
+exports.loginControlller = exports.verifyUserController = exports.registerController = void 0;
 const express_validator_1 = require("express-validator");
 const CONSTANTS_1 = require("../../CONSTANTS");
 const db_1 = require("../../db");
@@ -32,7 +32,7 @@ const registerController = (0, asynhandlerUtil_1.asyncHandler)((req, res) => __a
         throw { status: CONSTANTS_1.BAD_REQUEST, message: "User already exist" };
     const { otp: OTP, otpExpiry } = (0, slug_and_str_generator_1.generateOtp)();
     yield (0, sendOTP_1.sendOTP)(email, OTP, name)
-        .then((res) => console.log("OTP sent successfully"))
+        .then(() => console.log("OTP sent successfully"))
         .catch((err) => console.log(err));
     // password hashing
     const hashedPassword = (yield (0, passwordHasher_1.passwordHasher)(password, res)).toString();
@@ -115,3 +115,33 @@ const verifyUserController = (0, asynhandlerUtil_1.asyncHandler)((req, res) => _
         .json((0, apiResponseUtil_1.apiResponse)(CONSTANTS_1.OK, "OTP verified successfully", verifiedUser));
 }));
 exports.verifyUserController = verifyUserController;
+// ** User LoginController
+const loginControlller = (0, asynhandlerUtil_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        throw {
+            status: CONSTANTS_1.BAD_REQUEST,
+            message: "Please enter email and password",
+        };
+    }
+    const checkIfUserExist = yield db_1.prisma.user.findUnique({
+        where: { email },
+    });
+    if (!checkIfUserExist) {
+        throw {
+            status: CONSTANTS_1.BAD_REQUEST,
+            message: "Please register yourself first",
+        };
+    }
+    const isPasswordValid = yield (0, passwordHasher_1.verifyPassword)(password, checkIfUserExist === null || checkIfUserExist === void 0 ? void 0 : checkIfUserExist.password, res);
+    if (!isPasswordValid) {
+        throw {
+            status: CONSTANTS_1.FORBIDDEN,
+            message: "Invalid credentials"
+        };
+    }
+    //TODO: add sessions for users using jwt tokens.
+    /* Enter jwt code here */
+    return res.status(CONSTANTS_1.OK).json((0, apiResponseUtil_1.apiResponse)(CONSTANTS_1.OK, `${checkIfUserExist.name || "user"} logged in successfully`));
+}));
+exports.loginControlller = loginControlller;

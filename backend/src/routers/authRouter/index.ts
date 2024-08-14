@@ -1,15 +1,19 @@
 import { Router } from "express";
 
-import { ifUser, ifUserIsAdmin } from "../../middlewares/authMiddleware";
 import {
+  loginControlller,
   registerController,
   verifyUserController,
 } from "../../controllers/authControllers";
 import { userValidators } from "../../validation";
 const authRouter = Router();
 authRouter.route("/registerUser").post(userValidators, registerController);
+
 authRouter.route("/verifyUser").post(verifyUserController);
-authRouter.route("/hero").post((req, res) => {
+
+authRouter.route("/loginUser").post(loginControlller);
+
+authRouter.route("/hero").get((req, res) => {
   return res.send("hello world");
 });
 

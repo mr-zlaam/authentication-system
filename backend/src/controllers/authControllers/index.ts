@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
-import { BAD_REQUEST, OK } from "../../CONSTANTS";
+import { BAD_REQUEST, FORBIDDEN, OK } from "../../CONSTANTS";
 import { prisma } from "../../db";
 import { apiResponse } from "../../helper/apiResponseUtil";
 import { asyncHandler } from "../../helper/asynhandlerUtil";
-import { passwordHasher } from "../../helper/passwordHasher";
+import { passwordHasher, verifyPassword } from "../../helper/passwordHasher";
 import { sendOTP } from "../../helper/sendOTP";
 import { generateOtp } from "../../helper/slug_and_str_generator";
 import { UserData } from "../../types";
@@ -23,7 +23,7 @@ const registerController = asyncHandler(async (req: Request, res: Response) => {
 
   const { otp: OTP, otpExpiry } = generateOtp();
   await sendOTP(email, OTP, name)
-    .then((res) => console.log("OTP sent successfully"))
+    .then(() => console.log("OTP sent successfully"))
     .catch((err) => console.log(err));
   // password hashing
   const hashedPassword = (
@@ -108,18 +108,49 @@ const verifyUserController = asyncHandler(
     return res
       .status(OK)
       .json(apiResponse(OK, "OTP verified successfully", verifiedUser));
-  },
+  }
 );
 
 // ** User LoginController
 const loginControlller = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
-  if ((!email, !password)) {
+  if (!email || !password) {
     throw {
       status: BAD_REQUEST,
-      message: "Email and password is required",
+      message: "Please enter email and password",
     };
   }
+  const checkIfUserExist = await prisma.user.findUnique({
+    where: { email },
+  });
+  if (!checkIfUserExist) {
+    throw {
+      status: BAD_REQUEST,
+      message: "Please register yourself first",
+    };
+  }
+  const isPasswordValid = await verifyPassword(
+    password,
+    checkIfUserExist?.password,
+    res
+  );
+  if (!isPasswordValid) {
+    throw {
+      status: FORBIDDEN,
+      message: "Invalid credentials",
+    };
+  }
+  //TODO: add sessions for users using jwt tokens.
+
+  /* Enter jwt code here */
+  return res
+    .status(OK)
+    .json(
+      apiResponse(
+        OK,
+        `${checkIfUserExist.name || "user"} logged in successfully`
+      )
+    );
 });
 // Exports
-export { registerController, verifyUserController };
+export { registerController, verifyUserController, loginControlller };
